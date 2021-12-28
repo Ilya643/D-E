@@ -10,10 +10,18 @@ class Board:
         self.height = height
 
         self.board = []
+        n = 0
         for y in range(self.height):
             stroka = []
             for x in range(self.width):
-                stroka.append(0)
+                if x % 2 == 0:
+                    stroka.append((0 + n) % 2)
+                else:
+                    print(1)
+                    stroka.append((1 + n) % 2)
+            n += 1
+            if n == 2:
+                n = 0
             self.board.append(stroka)
 
         self.cell_size = 70
@@ -21,9 +29,14 @@ class Board:
     def render(self):
         for y in range(self.height):
             for x in range(self.width):
-                pygame.draw.rect(screen, pygame.Color(0, 0, 0),
-                                 (x * self.cell_size, y * self.cell_size,
-                                  self.cell_size, self.cell_size), 5)
+                if self.board[y][x] == 1:
+                    pygame.draw.rect(screen, pygame.Color(0, 0, 0),
+                                     (x * self.cell_size, y * self.cell_size,
+                                      self.cell_size, self.cell_size), 0)
+                else:
+                    pygame.draw.rect(screen, pygame.Color(255, 255, 255),
+                                     (x * self.cell_size, y * self.cell_size,
+                                      self.cell_size, self.cell_size), 0)
 
 
 board = Board(8, 8)

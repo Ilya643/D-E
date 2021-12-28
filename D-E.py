@@ -5,6 +5,9 @@ size = 700, 700
 indent = 70
 part = 15
 screen = pygame.display.set_mode(size)
+font = pygame.font.Font(None, 20)
+
+
 
 class Board:
     def __init__(self, width, height):
@@ -45,6 +48,7 @@ class Board:
         pygame.draw.rect(screen, pygame.Color("gold"), (indent - part - 4, indent - part - 4,
                                                         self.cell_size * 8 + part * 2 + 8,
                                                         self.cell_size * 8 + part * 2 + 8), part)
+
 
 
 board = Board(8, 8)

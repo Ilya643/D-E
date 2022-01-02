@@ -1,5 +1,5 @@
 import pygame
-from typing import Any
+
 
 pygame.init()
 
@@ -31,13 +31,9 @@ class Menu():
         menuativo = True
         while menuativo:
             for event in pygame.event.get():
-                # nt(event)
                 if event.type == pygame.MOUSEMOTION:
-                    print(event)
                     if 170 >= pygame.mouse.get_pos()[0] >= 20 and 90 >= pygame.mouse.get_pos()[1] >= 40:
                         pass
-
-
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if 170 >= pygame.mouse.get_pos()[0] >= 20 and 90 >= pygame.mouse.get_pos()[1] >= 40:
                         self.start()
@@ -57,6 +53,7 @@ class Menu():
         pygame.quit()
 
     def start(self):
-        pass
+        pygame.quit()
+
 
 a = Menu()

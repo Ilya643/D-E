@@ -4,17 +4,18 @@ import pygame
 
 pygame.init()
 size = 900, 700
+screen = pygame.display.set_mode(size)
+
 indent = 70
 part = 20
-screen = pygame.display.set_mode(size)
-font = pygame.font.Font(None, 50)
 Units = ['turtle']
 turtle_move = (700, 70, 120, 120)
 units_peek = (700, 0, 900, 700)
 turtle_active = False
 cell_size = 70
-picture = 'cyber_Turtle_frendly.png'
-coords = ''
+
+board_units = []
+
 
 
 class Board:
@@ -78,6 +79,11 @@ class Board:
                 return 'turtle'
         return None
 
+    def update(self):
+        for i in board_units:
+            screen.blit(pygame.transform.scale(
+                pygame.image.load(i[0]).convert_alpha(), (60, 60)), (5 + indent + i[1][0] * cell_size,
+                                                                     5 + indent + i[1][1] * cell_size))
 
 board = Board(8, 8)
 running = True
@@ -96,7 +102,7 @@ while running:
                     turtle_active = False
                     check = board.check(x, y)
                     if check[0] == True and check[1][1] > 3:
-                        print('рисуем фигуру')
+                        board_units.append(['cyber_Turtle_frendly.png', check[1]])
                 if board.check(x, y) == 'turtle':
                     arrow = pygame.image.load('cyber_Turtle_frendly.png')
                     turtle_active = True
@@ -107,6 +113,7 @@ while running:
 
     screen.fill((163, 110, 255))
     board.render()  # показываем дисплей
+    board.update()
     if pygame.mouse.get_focused():
         x, y = pygame.mouse.get_pos()
         screen.blit(arrow, (x, y))

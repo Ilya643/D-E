@@ -33,7 +33,7 @@ class Menu:
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEMOTION:
                     if 170 >= pygame.mouse.get_pos()[0] >= 20 and 90 >= pygame.mouse.get_pos()[1] >= 40:
-                        pass
+                        pygame.draw.rect(self.screen, (255, 0, 20), (20, 40, 150, 50))
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if 170 >= pygame.mouse.get_pos()[0] >= 20 and 90 >= pygame.mouse.get_pos()[1] >= 40:
                         # запускаем функцию старт

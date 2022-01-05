@@ -78,7 +78,6 @@ class Menu:
         self.input_box1 = input_box1
         self.screen.blit(self.font.render('Время игры:', True, (57, 255, 20)), (30, 350))
         self.screen.blit(self.font.render('Время хода:', True, (57, 255, 20)), (30, 450))
-        # попытка вклеить чужой код)))
         color_inactive = pygame.Color('lightskyblue3')
         color_active = pygame.Color('dodgerblue2')
         color = color_inactive
@@ -117,7 +116,6 @@ class Menu:
             pygame.draw.rect(self.screen, color, self.input_box1, 2)
             pygame.display.update()
             pygame.display.flip()
-
             # прописываем названия строк ввода
             #self.screen.blit(self.font.render('Время игры:', True, (57, 255, 20)), (30, 350))
             #self.screen.blit(self.font.render('Время хода:', True, (57, 255, 20)), (30, 450))

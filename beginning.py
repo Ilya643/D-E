@@ -1,11 +1,12 @@
 import pygame
 
 pygame.init()
+# создание самого первого окна меню
 
 
 class Menu:
     def __init__(self):
-        screen = pygame.display.set_mode((500, 400))
+        screen = pygame.display.set_mode((640, 480))
         self.screen = screen
         pygame.display.set_caption("menu")
         self.font = pygame.font.SysFont('Arial', 35)
@@ -62,7 +63,6 @@ class Menu:
                         # запускаем функцию создания меню
                         self.moving()
 
-
     def start(self):
         self.screen = pygame.display.set_mode((800, 600))
         self.screen.fill('black')
@@ -70,60 +70,85 @@ class Menu:
         pygame.display.update()
         pygame.display.flip()
         # запускаем функцию настройки
-        self.settings()
+        if __name__ == '__main__':
+            main()
         exit()
 
-    def settings(self):
-        input_box1 = pygame.Rect(270, 350, 50, 50)
-        self.input_box1 = input_box1
-        self.screen.blit(self.font.render('Время игры:', True, (57, 255, 20)), (30, 350))
-        self.screen.blit(self.font.render('Время хода:', True, (57, 255, 20)), (30, 450))
-        color_inactive = pygame.Color('lightskyblue3')
-        color_active = pygame.Color('dodgerblue2')
-        color = color_inactive
-        active = False
-        text = ''
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    exit()
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    # If the user clicked on the input_box rect.
-                    if self.input_box1.collidepoint(event.pos):
-                        # Toggle the active variable.
-                        active = not active
-                    else:
-                        active = False
-                    # Change the current color of the input box.
-                    color = color_active if active else color_inactive
-                if event.type == pygame.KEYDOWN:
-                    if active:
-                        if event.key == pygame.K_RETURN:
-                            print(text)
-                            text = ''
-                        elif event.key == pygame.K_BACKSPACE:
-                            text = text[:-1]
-                        else:
-                            text += event.unicode
-            #self.screen.fill((0, 0, 0))
-            txt_surface = self.font.render(text, True, color)
-            # Resize the box if the text is too long.
-            width = max(50, txt_surface.get_width() + 10)
-            self.input_box1.w = width
-            # Blit the text.
-            self.screen.blit(txt_surface, (self.input_box1.x + 5, self.input_box1.y + 5))
-            # Blit the input_box rect.
-            pygame.draw.rect(self.screen, color, self.input_box1, 2)
-            pygame.display.update()
-            pygame.display.flip()
-            # прописываем названия строк ввода
-            #self.screen.blit(self.font.render('Время игры:', True, (57, 255, 20)), (30, 350))
-            #self.screen.blit(self.font.render('Время хода:', True, (57, 255, 20)), (30, 450))
-            # создаем окна для ввода
-            input_box2 = pygame.draw.rect(self.screen, (0, 0, 0), (270, 450, 150, 50))
-            self.input_box2 = input_box2
-            pygame.display.update()
-            pygame.display.flip()
+# создание элементов для 2 меню
+screen = pygame.display.set_mode((640, 480))
+color_inactive = pygame.Color((0, 255, 0))
+color_active = pygame.Color('dodgerblue2')
+font = pygame.font.Font(None, 32)
+
+# класс 2 меню
+class InputBox:
+    def __init__(self, x, y, w, h, text=''):
+        self.rect = pygame.Rect(x, y, w, h)
+        self.color = color_inactive
+        self.text = text
+        self.txt_surface = font.render(text, True, self.color)
+        self.active = False
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # If the user clicked on the input_box rect.
+            if self.rect.collidepoint(event.pos):
+                # Toggle the active variable.
+                self.active = not self.active
+            else:
+                self.active = False
+            # Change the current color of the input box.
+            self.color = color_active if self.active else color_inactive
+        if event.type == pygame.KEYDOWN:
+            if self.active:
+                if event.key == pygame.K_RETURN:
+                    # проверка введенного текста
+                    # текст должен быть целым числом от 5 до 25 минут
+                    # если текст не проходит проверку, то окно ввода очищается
+                    if not self.text.isdigit() or len(self.text) > 2:
+                        self.text = ''
+                    elif int(self.text) < 5 or int(self.text) > 25:
+                        self.text = ''
+                elif event.key == pygame.K_BACKSPACE:
+                    self.text = self.text[:-1]
+                else:
+                    self.text += event.unicode
+                # Re-render the text.
+                self.txt_surface = font.render(self.text, True, self.color)
+
+
+    def update(self):
+        # Resize the box if the text is too long.
+        width = max(70, self.txt_surface.get_width() + 10)
+        self.rect.w = width
+
+    def draw(self, screen):
+        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
+        screen.blit(font.render('Время игры:', True, (57, 255, 20)), (30, 415))
+        screen.blit(font.render('Время хода:', True, (57, 255, 20)), (30, 515))
+        pygame.draw.rect(screen, self.color, self.rect, 2)
+
+
+def main():
+    clock = pygame.time.Clock()
+    input_box1 = InputBox(300, 400, 140, 50)
+    input_box2 = InputBox(300, 500, 140, 50)
+    # список полей ввода
+    input_boxes = [input_box1, input_box2]
+    done = False
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            for box in input_boxes:
+                box.handle_event(event)
+        for box in input_boxes:
+            box.update()
+        screen.fill((30, 30, 30))
+        for box in input_boxes:
+            box.draw(screen)
+        pygame.display.flip()
+        clock.tick(30)
 
 
 a = Menu()

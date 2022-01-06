@@ -1,5 +1,3 @@
-
-
 import pygame
 
 pygame.init()
@@ -114,7 +112,9 @@ class Pawn_1:
             for i in board_units_e:
                 if (self.x, self.y) in i:
                     m = False
-                    break
+            for i in board_units_f:
+                if (self.x, self.y) in i:
+                    m = False
             if m:
                 moves.append([(self.x, self.y), 1])
         moving = []
@@ -164,7 +164,9 @@ class Pawn_2:
             for i in board_units_e:
                 if (self.x, self.y) in i:
                     m = False
-                    break
+            for i in board_units_f:
+                if (self.x, self.y) in i:
+                    m = False
             if m:
                 moves.append([(self.x, self.y), 1])
         moving = []
@@ -363,7 +365,99 @@ class Queen:
 
 class Square:
     def __init__(self, coords):
-        print('Square')
+        self.x, self.y = coords[0], coords[1]
+        self.move()
+
+    def move(self):
+        del moves[:]
+        if self.y != 0:
+            x, y = self.x, self.y
+            m = True
+            for i in board_units_f:
+                if (x, y - 1) in i:
+                    m = False
+            if m:
+                moves.append([(x, y - 1), 4])
+
+            if self.x != 0:
+                x, y = self.x, self.y
+                m = True
+                for i in board_units_f:
+                    if (x - 1, y - 1) in i:
+                        m = False
+                if m:
+                    moves.append([(x - 1, y - 1), 4])
+
+            if self.x != 7:
+                x, y = self.x, self.y
+                m = True
+                for i in board_units_f:
+                    if (x + 1, y - 1) in i:
+                        m = False
+                if m:
+                    moves.append([(x + 1, y - 1), 4])
+
+        if self.y != 7:
+            x, y = self.x, self.y
+            m = True
+            for i in board_units_f:
+                if (x, y + 1) in i:
+                    m = False
+            if m:
+                moves.append([(x, y + 1), 4])
+
+            if self.x != 0:
+                x, y = self.x, self.y
+                m = True
+                for i in board_units_f:
+                    if (x - 1, y + 1) in i:
+                        m = False
+                if m:
+                    moves.append([(x - 1, y + 1), 4])
+
+            if self.x != 7:
+                x, y = self.x, self.y
+                m = True
+                for i in board_units_f:
+                    if (x + 1, y + 1) in i:
+                        m = False
+                if m:
+                    moves.append([(x + 1, y + 1), 4])
+
+        if self.x != 0:
+            x, y = self.x, self.y
+            m = True
+            for i in board_units_f:
+                if (x - 1, y) in i:
+                    m = False
+            if m:
+                moves.append([(x - 1, y), 4])
+
+        if self.x != 7:
+            x, y = self.x, self.y
+            m = True
+            for i in board_units_f:
+                if (x + 1, y) in i:
+                    m = False
+            if m:
+                moves.append([(x + 1, y), 4])
+
+
+
+    def moving(self, coords):
+        del moves[:]
+        for i in board_units_f:
+            if coords_unit in i:
+                m = board_units_f.index(i)
+                a = board_units_f.pop(m)
+                a.pop(1)
+                a.insert(1, coords)
+                board_units_f.insert(m, a)
+                break
+        for i in board_units_e:
+            if coords in i:
+                board_units_e.pop(board_units_e.index(i))
+                break
 
 
 board = Board(8, 8)

@@ -76,103 +76,89 @@ class Menu:
         exit()
 
 
-# создание элементов для 2 меню
-screen = pygame.display.set_mode((640, 480))
-color_inactive = pygame.Color((0, 255, 0))
-color_active = pygame.Color('dodgerblue2')
-font = pygame.font.Font(None, 32)
-
-
-# класс 2 меню, поле ввода время игры
-class InputBox:
-    def __init__(self, x, y, w, h, text=''):
+class RadioButton(pygame.sprite.Sprite):
+    def __init__(self, x, y, w, h, font, text):
+        super().__init__()
+        self.font = None
+        self.screen = None
+        text_surf = font.render(text, True, (0, 0, 0))
+        self.button_image = pygame.Surface((w, h))
+        self.button_image.fill((169, 169, 169))
+        self.button_image.blit(text_surf, text_surf.get_rect(center=(w // 2, h // 2)))
+        self.hover_image = pygame.Surface((w, h))
+        self.hover_image.fill((169, 169, 169))
+        self.hover_image.blit(text_surf, text_surf.get_rect(center=(w // 2, h // 2)))
+        pygame.draw.rect(self.hover_image, (255, 99, 71), self.hover_image.get_rect(), 3)
+        self.clicked_image = pygame.Surface((w, h))
+        self.clicked_image.fill((255, 99, 71))
+        self.clicked_image.blit(text_surf, text_surf.get_rect(center=(w // 2, h // 2)))
+        self.image = self.button_image
         self.rect = pygame.Rect(x, y, w, h)
-        self.color = color_inactive
-        self.text = text
-        self.txt_surface = font.render(text, True, self.color)
-        self.active = False
+        self.clicked = False
+        self.buttons = None
 
-    # функция для создания поля ввода
-    def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            # If the user clicked on the input_box rect.
-            if self.rect.collidepoint(event.pos):
-                # Toggle the active variable.
-                self.active = not self.active
-            else:
-                self.active = False
-            # Change the current color of the input box.
-            self.color = color_active if self.active else color_inactive
-        if event.type == pygame.KEYDOWN:
-            if self.active:
-                if event.key == pygame.K_RETURN:
-                    # проверка введенного текста
-                    # текст должен быть целым числом от 5 до 25 минут
-                    # если текст не проходит проверку, то окно ввода очищается
-                    if not self.text.isdigit() or len(self.text) > 2:
-                        self.text = ''
-                    elif int(self.text) < 5 or int(self.text) > 25:
-                        self.text = ''
-                elif event.key == pygame.K_BACKSPACE:
-                    self.text = self.text[:-1]
-                else:
-                    self.text += event.unicode
-                # Re-render the text.
-                self.txt_surface = font.render(self.text, True, self.color)
 
-    def update(self):
-        # Resize the box if the text is too long.
-        width = max(70, self.txt_surface.get_width() + 10)
-        self.rect.w = width
 
-    def draw(self, screen):
-        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
-        screen.blit(font.render('Время игры (в минутах):', True, (57, 255, 20)), (30, 415))
-        screen.blit(font.render('Выберите уровень игры:', True, (57, 255, 20)), (20, 15))
-        pygame.draw.rect(screen, self.color, self.rect, 2)
+    def setRadioButtons(self, buttons):
+        self.buttons = buttons
 
-        self.lever_drawing()
-
-    def lever_drawing(self):
-        self.leve_one = pygame.Rect(30, 50, 100, 100)
-        c_i = pygame.Color((0, 255, 0))
-        c_a = pygame.Color('dodgerblue2')
-        self.c = c_i
-        self.a = False
-        for event in pygame.event.get():
+    def update(self, event_list):
+        hover = self.rect.collidepoint(pygame.mouse.get_pos())
+        for event in event_list:
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # If the user clicked on the input_box rect.
-                if self.leve_one.collidepoint(event.pos):
-                    # Toggle the active variable.
-                    self.a = not self.a
-                else:
-                    self.a = False
-                # Change the current color of the input box.
-                self.c = c_a if self.a else c_i
-        pygame.draw.rect(screen, self.c, self.leve_one, 2)
+                print(event)
+                if 400 >= pygame.mouse.get_pos()[0] >= 50 and 60 >= pygame.mouse.get_pos()[1] >= 40:
+                    print(1)
+                if hover and event.button == 1:
+                    for rb in self.buttons:
+                        rb.clicked = False
+                    self.clicked = True
+
+        self.image = self.button_image
+        if self.clicked:
+            self.image = self.clicked_image
+        elif hover:
+            self.image = self.hover_image
+
 
 
 
 def main():
+    pygame.init()
+    window = pygame.display.set_mode((640, 480))
     clock = pygame.time.Clock()
-    input_box1 = InputBox(300, 400, 140, 50)
-    # список полей ввода
-    input_boxes = [input_box1]
-    done = False
-    while not done:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                done = True
-            for box in input_boxes:
+    font50 = pygame.font.SysFont(None, 50)
 
-                box.handle_event(event)
-        for box in input_boxes:
-            box.update()
-        screen.fill((30, 30, 30))
-        for box in input_boxes:
-            box.draw(screen)
+    radioButtons = [
+        RadioButton(50, 40, 350, 60, font50, "Первый уровень"),
+        RadioButton(50, 120, 350, 60, font50, "Второй уровень"),
+        RadioButton(50, 200, 350, 60, font50, "Третий уровень")
+    ]
+    for rb in radioButtons:
+        rb.setRadioButtons(radioButtons)
+    radioButtons[0].clicked = True
+
+    group = pygame.sprite.Group(radioButtons)
+
+    run = True
+    while run:
+        clock.tick(60)
+        event_list = pygame.event.get()
+        for event in event_list:
+            if event.type == pygame.QUIT:
+                run = False
+
+        group.update(event_list)
+
+        window.fill(0)
+        group.draw(window)
         pygame.display.flip()
-        clock.tick(30)
+
+    pygame.quit()
+    exit()
 
 
 a = Menu()
+
+if __name__ == '__main__':
+    main()

@@ -59,10 +59,12 @@ class Menu:
         pygame.display.flip()
         while True:
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if 730 >= pygame.mouse.get_pos()[0] >= 580 and 530 >= pygame.mouse.get_pos()[1] >= 480:
                         # запускаем функцию создания меню
-                        self.moving()
+                        b = Menu()
 
     def start(self):
         self.screen = pygame.display.set_mode((800, 600))

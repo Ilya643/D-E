@@ -131,6 +131,27 @@ class InputBox:
         screen.blit(font.render('Выберите уровень игры:', True, (57, 255, 20)), (20, 15))
         pygame.draw.rect(screen, self.color, self.rect, 2)
 
+        self.lever_drawing()
+
+    def lever_drawing(self):
+        self.leve_one = pygame.Rect(30, 50, 100, 100)
+        c_i = pygame.Color((0, 255, 0))
+        c_a = pygame.Color('dodgerblue2')
+        self.c = c_i
+        self.a = False
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # If the user clicked on the input_box rect.
+                if self.leve_one.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    self.a = not self.a
+                else:
+                    self.a = False
+                # Change the current color of the input box.
+                self.c = c_a if self.a else c_i
+        pygame.draw.rect(screen, self.c, self.leve_one, 2)
+
+
 
 def main():
     clock = pygame.time.Clock()

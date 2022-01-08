@@ -183,14 +183,16 @@ def main():
     exit()
 
 
-screen = pygame.display.set_mode((640, 480))
+
 font = pygame.font.SysFont('Arial', 35)
-screen.fill((0, 0, 0))
 pygame.display.set_caption('menu_continue')
 
 
 # функция, запускающаяся после выбора уровня
 def mn():
+    # меняем размер экрана для удобства
+    screen = pygame.display.set_mode((640, 580))
+    screen.fill((0, 0, 0))
     clock = pygame.time.Clock()
     input_box = pygame.Rect(370, 10, 140, 52)
     input_box2 = pygame.Rect(370, 100, 140, 52)
@@ -198,8 +200,7 @@ def mn():
     color_active = pygame.Color('dodgerblue2')
     color = color_inactive
     active = False
-    text = '0'
-
+    text = ''
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
@@ -208,8 +209,13 @@ def mn():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # кнопка возврата
                 # на тот случай если пользователь захочет вернуться к выбору уровня игры
-                if 160 >= pygame.mouse.get_pos()[0] >= 20 and 440 >= pygame.mouse.get_pos()[1] >= 370:
+                if 160 >= pygame.mouse.get_pos()[0] >= 20 and 540 >= pygame.mouse.get_pos()[1] >= 470:
                     main()
+                # кнопка начать игру
+                # должно открываться игровое поле
+                # начало игры
+                if 620 >= pygame.mouse.get_pos()[0] >= 440 and 540 >= pygame.mouse.get_pos()[1] >= 470:
+                    pass
                 # If the user clicked on the input_box rect.
                 if input_box.collidepoint(event.pos):
                     # Toggle the active variable.
@@ -222,21 +228,29 @@ def mn():
                 if active:
                     if event.key == pygame.K_RETURN:
                         if not text.isdigit() or len(text) > 3 or int(text) < 5 or int(text) > 25:
-                            text = '0'
+                            text = ''
                     elif event.key == pygame.K_BACKSPACE:
                         text = text[:-1]
                     else:
                         text += event.unicode
         screen.fill((0, 0, 0))
         # прямоугольник для кнопки возврата
-        pygame.draw.rect(screen, (57, 255, 20), (20, 370, 140, 70))
-        screen.blit(font.render('Вернуться', True, (0, 0, 0)), (20, 380))
+        pygame.draw.rect(screen, (57, 255, 20), (20, 470, 140, 70))
+        # прямоугольник для кнопки начать игру
+        pygame.draw.rect(screen, (57, 255, 20), (440, 470, 180, 70))
+        screen.blit(font.render('Вернуться', True, (0, 0, 0)), (20, 480))
         screen.blit(font.render('Время игры (в минутах):', True, (57, 255, 20)), (10, 10))
         screen.blit(font.render('Время хода (в секундах):', True, (57, 255, 20)), (10, 100))
-        screen.blit(font.render('Далее', True, (0, 255, 0)), (20, 380))
+        screen.blit(font.render('Начать игру', True, (0, 0, 0)), (450, 480))
         # Render the current text.
         txt_surface = font.render(text, True, color)
-        txt_surface2 = font.render(str(int(text) * 60 * 0.15), True, color)
+        # проверка время хода
+        # что бы не было ошибок при вводе времени игры
+        if text.isdigit() and int(text) <= 25 and int(text) >= 5:
+            # если все оказалось верно, то берем 15% от всего времени игры
+            txt_surface2 = font.render(str(int(text) * 60 * 0.15), True, color)
+        else:
+            txt_surface2 = font.render(str('Error'), True, color)
         # Resize the box if the text is too long.
         width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
@@ -246,6 +260,7 @@ def mn():
         # Blit the input_box rect.
         pygame.draw.rect(screen, color, input_box, 2)
         pygame.draw.rect(screen, color, input_box2, 2)
+        pygame.display.update()
         pygame.display.flip()
         clock.tick(30)
         mn_2()

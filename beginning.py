@@ -11,6 +11,11 @@ class Menu:
         self.screen = screen
         pygame.display.set_caption("menu")
         self.font = pygame.font.SysFont('Arial', 35)
+        # вставляем изображении черепашки в меню)
+        turtole = pygame.image.load('img_D&E.bmp')
+        turtole.set_colorkey((255, 255, 255))
+        turtole_rect = turtole.get_rect(center=(750 // 2, 720 // 2))
+        screen.blit(turtole, turtole_rect)
         # создание кнопок меню
         # кнопка старт
         start_button = pygame.draw.rect(self.screen, (57, 255, 20), (20, 40, 150, 50))
@@ -65,10 +70,9 @@ class Menu:
                     if 730 >= pygame.mouse.get_pos()[0] >= 580 and 530 >= pygame.mouse.get_pos()[1] >= 480:
                         # запускаем функцию создания меню
                         # делаем это через создание нового элемента класса
-                        b = Menu()
+                        Menu()
 
     def start(self):
-        self.screen = pygame.display.set_mode((800, 600))
         self.screen.fill('black')
         pygame.display.set_caption("menu_continue")
         pygame.display.update()
@@ -77,6 +81,7 @@ class Menu:
         if __name__ == '__main__':
             main()
         exit()
+
 
 # класс для выбора уровня
 # продолжения менюхи
@@ -102,8 +107,6 @@ class RadioButton(pygame.sprite.Sprite):
         self.clicked = False
         self.buttons = None
 
-
-
     def setRadioButtons(self, buttons):
         self.buttons = buttons
 
@@ -126,6 +129,11 @@ class RadioButton(pygame.sprite.Sprite):
                     if __name__ == '__main__':
                         mn()
                     exit()
+                # возврат в главное меню
+                elif 600 >= pygame.mouse.get_pos()[0] >= 450 and 440 >= pygame.mouse.get_pos()[1] >= 380:
+                    if __name__ == '__main__':
+                        Menu()
+                    exit()
                 if hover and event.button == 1:
                     for rb in self.buttons:
                         rb.clicked = False
@@ -138,24 +146,24 @@ class RadioButton(pygame.sprite.Sprite):
             self.image = self.hover_image
 
 
-
-
 def main():
     pygame.init()
     window = pygame.display.set_mode((640, 480))
     clock = pygame.time.Clock()
     font50 = pygame.font.SysFont(None, 50)
-
-    radioButtons = [
+    radiobuttons = [
         RadioButton(50, 40, 350, 60, font50, "Первый уровень"),
         RadioButton(50, 120, 350, 60, font50, "Второй уровень"),
-        RadioButton(50, 200, 350, 60, font50, "Третий уровень")
+        RadioButton(50, 200, 350, 60, font50, "Третий уровень"),
+        # создаем еще одну кнопку, чтобы пользователь мог вернуться в главное меню
+        # после выбора уровня
+        RadioButton(450, 380, 150, 60, font50, "Назад")
     ]
-    for rb in radioButtons:
-        rb.setRadioButtons(radioButtons)
-    radioButtons[0].clicked = True
+    for rb in radiobuttons:
+        rb.setRadioButtons(radiobuttons)
+    radiobuttons[0].clicked = True
 
-    group = pygame.sprite.Group(radioButtons)
+    group = pygame.sprite.Group(radiobuttons)
 
     run = True
     while run:
@@ -174,25 +182,24 @@ def main():
     pygame.quit()
     exit()
 
+
+screen = pygame.display.set_mode((640, 480))
+font = pygame.font.SysFont('Arial', 35)
+screen.fill((0, 0, 0))
+pygame.display.set_caption('menu_continue')
+
+
 # функция, запускающаяся после выбора уровня
 def mn():
-    screen = pygame.display.set_mode((640, 480))
-    screen.fill((0, 0, 0))
-    pygame.display.set_caption('menu_continue')
-    font = pygame.font.SysFont('Arial', 35)
-    # прямоугольник для кнопки возврата
-    returning = pygame.draw.rect(screen, (57, 255, 20), (20, 370, 140, 70))
-    screen.blit(font.render('Вернуться', True, (0, 0, 0)), (20, 380))
-    screen.blit(font.render('Время игры (в минутах):', True, (57, 255, 20)), (10, 20))
-
     clock = pygame.time.Clock()
     input_box = pygame.Rect(370, 10, 140, 52)
+    input_box2 = pygame.Rect(370, 100, 140, 52)
     color_inactive = pygame.Color('lightskyblue3')
     color_active = pygame.Color('dodgerblue2')
     color = color_inactive
     active = False
-    text = ''
-    done = False
+    text = '0'
+
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
@@ -214,29 +221,38 @@ def mn():
             if event.type == pygame.KEYDOWN:
                 if active:
                     if event.key == pygame.K_RETURN:
-                        if not text.isdigit() or len(text) > 2 or int(text) < 5 or int(text) > 25:
-                            text = ''
+                        if not text.isdigit() or len(text) > 3 or int(text) < 5 or int(text) > 25:
+                            text = '0'
                     elif event.key == pygame.K_BACKSPACE:
                         text = text[:-1]
                     else:
                         text += event.unicode
         screen.fill((0, 0, 0))
-        returning = pygame.draw.rect(screen, (57, 255, 20), (20, 370, 140, 70))
+        # прямоугольник для кнопки возврата
+        pygame.draw.rect(screen, (57, 255, 20), (20, 370, 140, 70))
         screen.blit(font.render('Вернуться', True, (0, 0, 0)), (20, 380))
         screen.blit(font.render('Время игры (в минутах):', True, (57, 255, 20)), (10, 10))
+        screen.blit(font.render('Время хода (в секундах):', True, (57, 255, 20)), (10, 100))
+        screen.blit(font.render('Далее', True, (0, 255, 0)), (20, 380))
         # Render the current text.
         txt_surface = font.render(text, True, color)
+        txt_surface2 = font.render(str(int(text) * 60 * 0.15), True, color)
         # Resize the box if the text is too long.
         width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
         # Blit the text.
         screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        screen.blit(txt_surface2, (input_box2.x + 5, input_box2.y + 5))
         # Blit the input_box rect.
         pygame.draw.rect(screen, color, input_box, 2)
+        pygame.draw.rect(screen, color, input_box2, 2)
         pygame.display.flip()
         clock.tick(30)
+        mn_2()
+
+
+def mn_2():
+    pass
+
 
 a = Menu()
-
-
-

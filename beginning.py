@@ -215,13 +215,14 @@ def mn():
                 # начало игры
                 if 620 >= pygame.mouse.get_pos()[0] >= 440 and 540 >= pygame.mouse.get_pos()[1] >= 470:
                     pass
-                # If the user clicked on the input_box rect.
+                # Если пользователь нажал на время игры
+                # окно время хода пользователь редактировать не может
                 if input_box.collidepoint(event.pos):
-                    # Toggle the active variable.
+                    # меняем цвет
                     active = not active
                 else:
                     active = False
-                # Change the current color of the input box.
+                # изменение цвета в отрисовке
                 color = color_active if active else color_inactive
             if event.type == pygame.KEYDOWN:
                 if active:
@@ -241,7 +242,7 @@ def mn():
         screen.blit(font.render('Время игры (в минутах):', True, (57, 255, 20)), (10, 10))
         screen.blit(font.render('Время хода (в секундах):', True, (57, 255, 20)), (10, 100))
         screen.blit(font.render('Начать игру', True, (0, 0, 0)), (450, 480))
-        # Render the current text.
+        # Размещаем текст в окне
         txt_surface = font.render(text, True, color)
         # проверка время хода
         # что бы не было ошибок при вводе времени игры
@@ -250,13 +251,12 @@ def mn():
             txt_surface2 = font.render(str(int(text) * 60 * 0.15), True, color)
         else:
             txt_surface2 = font.render(str('Error'), True, color)
-        # Resize the box if the text is too long.
+        # Удлиняем поле ввода, если вводимый текст слишком длинный
         width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
-        # Blit the text.
+        # отражаем текст в окнах
         screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
         screen.blit(txt_surface2, (input_box2.x + 5, input_box2.y + 5))
-        # Blit the input_box rect.
         pygame.draw.rect(screen, color, input_box, 2)
         pygame.draw.rect(screen, color, input_box2, 2)
         pygame.display.update()

@@ -85,7 +85,7 @@ class Menu:
 
 # класс для выбора уровня
 # продолжения менюхи
-class RadioButton(pygame.sprite.Sprite):
+class Level_Button(pygame.sprite.Sprite):
     def __init__(self, x, y, w, h, font, text):
         super().__init__()
         self.font = None
@@ -107,7 +107,7 @@ class RadioButton(pygame.sprite.Sprite):
         self.clicked = False
         self.buttons = None
 
-    def setRadioButtons(self, buttons):
+    def setLevelButtons(self, buttons):
         self.buttons = buttons
 
     def update(self, event_list):
@@ -151,19 +151,19 @@ def main():
     window = pygame.display.set_mode((640, 480))
     clock = pygame.time.Clock()
     font50 = pygame.font.SysFont(None, 50)
-    radiobuttons = [
-        RadioButton(50, 40, 350, 60, font50, "Первый уровень"),
-        RadioButton(50, 120, 350, 60, font50, "Второй уровень"),
-        RadioButton(50, 200, 350, 60, font50, "Третий уровень"),
+    level_buttons = [
+        Level_Button(50, 40, 350, 60, font50, "Первый уровень"),
+        Level_Button(50, 120, 350, 60, font50, "Второй уровень"),
+        Level_Button(50, 200, 350, 60, font50, "Третий уровень"),
         # создаем еще одну кнопку, чтобы пользователь мог вернуться в главное меню
         # после выбора уровня
-        RadioButton(450, 380, 150, 60, font50, "Назад")
+        Level_Button(450, 380, 150, 60, font50, "Назад")
     ]
-    for rb in radiobuttons:
-        rb.setRadioButtons(radiobuttons)
-    radiobuttons[0].clicked = True
+    for rb in level_buttons:
+        rb.setLevelButtons(level_buttons)
+    level_buttons[0].clicked = True
 
-    group = pygame.sprite.Group(radiobuttons)
+    group = pygame.sprite.Group(level_buttons)
 
     run = True
     while run:
@@ -181,7 +181,6 @@ def main():
 
     pygame.quit()
     exit()
-
 
 
 font = pygame.font.SysFont('Arial', 35)
@@ -246,7 +245,7 @@ def mn():
         txt_surface = font.render(text, True, color)
         # проверка время хода
         # что бы не было ошибок при вводе времени игры
-        if text.isdigit() and int(text) <= 25 and int(text) >= 5:
+        if text.isdigit() and 25 >= int(text) >= 5:
             # если все оказалось верно, то берем 15% от всего времени игры
             txt_surface2 = font.render(str(int(text) * 60 * 0.15), True, color)
         else:
@@ -263,11 +262,6 @@ def mn():
         pygame.display.update()
         pygame.display.flip()
         clock.tick(30)
-        mn_2()
-
-
-def mn_2():
-    pass
 
 
 a = Menu()

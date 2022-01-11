@@ -2,7 +2,7 @@ import pygame
 
 pygame.init()
 
-
+level = []
 # меню игры D&E
 # создание самого первого окна меню
 class Menu:
@@ -255,6 +255,21 @@ def mn():
                     else:
                         text += event.unicode
         screen.fill((0, 0, 0))
+        # скин краба
+        crab = pygame.image.load('img_crab.bmp')
+        crab.set_colorkey((255, 255, 255))
+        crab_rect = crab.get_rect(center=(250 // 2, 720 // 2))
+        screen.blit(crab, crab_rect)
+        # скин осьминога
+        octopus = pygame.image.load('img_Octopus.bmp')
+        octopus.set_colorkey((255, 255, 255))
+        octopus_rect = octopus.get_rect(center=(550 // 2, 760 // 2))
+        screen.blit(octopus, octopus_rect)
+        # скин черепахи
+        turtole2 = pygame.image.load('img_turtel2.bmp')
+        turtole2.set_colorkey((255, 255, 255))
+        turtole2_rect = turtole2.get_rect(center=(950 // 2, 760 // 2))
+        screen.blit(turtole2, turtole2_rect)
         # прямоугольник для кнопки возврата
         pygame.draw.rect(screen, (57, 255, 20), (20, 470, 140, 70))
         # прямоугольник для кнопки начать игру

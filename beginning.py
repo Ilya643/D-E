@@ -116,16 +116,19 @@ class Level_Button(pygame.sprite.Sprite):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # уровень 1
                 if 400 >= pygame.mouse.get_pos()[0] >= 50 and 99 >= pygame.mouse.get_pos()[1] >= 40:
+                    print(1)
                     if __name__ == '__main__':
                         mn()
                     exit()
                 # уровень 2
                 elif 400 >= pygame.mouse.get_pos()[0] >= 50 and 180 >= pygame.mouse.get_pos()[1] >= 120:
+                    print(2)
                     if __name__ == '__main__':
                         mn()
                     exit()
                 # уровень 3
                 elif 400 >= pygame.mouse.get_pos()[0] >= 50 and 260 >= pygame.mouse.get_pos()[1] >= 200:
+                    print(3)
                     if __name__ == '__main__':
                         mn()
                     exit()
@@ -198,8 +201,13 @@ def mn():
     color_inactive = pygame.Color('lightskyblue3')
     color_active = pygame.Color('dodgerblue2')
     color = color_inactive
+    # цвет кнопки начать игру, при неактивном состоянии
+    b_color = pygame.Color('Silver')
+    # текст для кнопки запуска игры
+    b_text = 'Проверить'
     active = False
-    text = ''
+    text = '10'
+    time_hod = 'Error'
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
@@ -214,7 +222,20 @@ def mn():
                 # должно открываться игровое поле
                 # начало игры
                 if 620 >= pygame.mouse.get_pos()[0] >= 440 and 540 >= pygame.mouse.get_pos()[1] >= 470:
-                    pass
+                    print(text)
+                    print(time_hod)
+                    # если все правильно введено, то кнопка начать игру работает
+                    # осуществляем проверку с помощью переменной time_hod
+                    if time_hod != 'Error':
+                        # меняем цвет кнопки запуска игры, на активный
+                        b_color = pygame.Color('YellowGreen')
+                        # меняем текст кнопки запуска
+                        b_text = 'Начать игру'
+                    else:
+                        # меняем цвет кнопки запуска, на неактивный
+                        b_color = pygame.Color('Silver')
+                        # убираем тект начала игры
+                        b_text = 'Проверить'
                 # Если пользователь нажал на время игры
                 # окно время хода пользователь редактировать не может
                 if input_box.collidepoint(event.pos):
@@ -237,20 +258,24 @@ def mn():
         # прямоугольник для кнопки возврата
         pygame.draw.rect(screen, (57, 255, 20), (20, 470, 140, 70))
         # прямоугольник для кнопки начать игру
-        pygame.draw.rect(screen, (57, 255, 20), (440, 470, 180, 70))
+        pygame.draw.rect(screen, b_color, (440, 470, 180, 70))
         screen.blit(font.render('Вернуться', True, (0, 0, 0)), (20, 480))
         screen.blit(font.render('Время игры (в минутах):', True, (57, 255, 20)), (10, 10))
         screen.blit(font.render('Время хода (в секундах):', True, (57, 255, 20)), (10, 100))
-        screen.blit(font.render('Начать игру', True, (0, 0, 0)), (450, 480))
+        screen.blit(font.render(b_text, True, (0, 0, 0)), (450, 480))
         # Размещаем текст в окне
         txt_surface = font.render(text, True, color)
         # проверка время хода
         # что бы не было ошибок при вводе времени игры
         if text.isdigit() and 25 >= int(text) >= 5:
             # если все оказалось верно, то берем 15% от всего времени игры
-            txt_surface2 = font.render(str(int(text) * 60 * 0.15), True, color)
+            # переменная для обозначения время хода игры
+            time_hod = str(int(text) * 60 * 0.15)
+            txt_surface2 = font.render(time_hod, True, color)
         else:
-            txt_surface2 = font.render(str('Error'), True, color)
+            # если текст неправильный, то сообщение об ошибке
+            time_hod = 'Error'
+            txt_surface2 = font.render(time_hod, True, color)
         # Удлиняем поле ввода, если вводимый текст слишком длинный
         width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
@@ -262,6 +287,5 @@ def mn():
         pygame.display.update()
         pygame.display.flip()
         clock.tick(30)
-
 
 a = Menu()

@@ -2,9 +2,16 @@ import pygame
 
 pygame.init()
 
-level = []
+# передает значение о выбранном уровне
+level = 0
+# передает значение о выбранном времени
+time = 0
+# передает значение о выбранном скине
+skin = 0
 # меню игры D&E
 # создание самого первого окна меню
+
+
 class Menu:
     def __init__(self):
         screen = pygame.display.set_mode((640, 480))
@@ -88,7 +95,7 @@ class Menu:
 class Level_Button(pygame.sprite.Sprite):
     def __init__(self, x, y, w, h, font, text):
         super().__init__()
-        self.font = None
+        self.font = font
         self.screen = pygame.display.set_mode((640, 480))
         text_surf = font.render(text, True, (0, 0, 0))
         self.button_image = pygame.Surface((w, h))
@@ -111,24 +118,25 @@ class Level_Button(pygame.sprite.Sprite):
         self.buttons = buttons
 
     def update(self, event_list):
+        global level
         hover = self.rect.collidepoint(pygame.mouse.get_pos())
         for event in event_list:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # уровень 1
                 if 400 >= pygame.mouse.get_pos()[0] >= 50 and 99 >= pygame.mouse.get_pos()[1] >= 40:
-                    print(1)
+                    level = 1
                     if __name__ == '__main__':
                         mn()
                     exit()
                 # уровень 2
                 elif 400 >= pygame.mouse.get_pos()[0] >= 50 and 180 >= pygame.mouse.get_pos()[1] >= 120:
-                    print(2)
+                    level = 2
                     if __name__ == '__main__':
                         mn()
                     exit()
                 # уровень 3
                 elif 400 >= pygame.mouse.get_pos()[0] >= 50 and 260 >= pygame.mouse.get_pos()[1] >= 200:
-                    print(3)
+                    level = 3
                     if __name__ == '__main__':
                         mn()
                     exit()
@@ -153,7 +161,7 @@ def main():
     pygame.init()
     window = pygame.display.set_mode((640, 480))
     clock = pygame.time.Clock()
-    font50 = pygame.font.SysFont(None, 50)
+    font50 = pygame.font.SysFont('Arial', 50)
     level_buttons = [
         Level_Button(50, 40, 350, 60, font50, "Первый уровень"),
         Level_Button(50, 120, 350, 60, font50, "Второй уровень"),
@@ -192,6 +200,8 @@ pygame.display.set_caption('menu_continue')
 
 # функция, запускающаяся после выбора уровня
 def mn():
+    global skin
+    global time
     # меняем размер экрана для удобства
     screen = pygame.display.set_mode((640, 580))
     screen.fill((0, 0, 0))
@@ -212,6 +222,7 @@ def mn():
     turtole_color = pygame.Color('Silver')
     crab_color = pygame.Color('Silver')
     octupos_color = pygame.Color('Silver')
+    # ddded показывает выбрат ли какой-то скин, если она равна 0, то нельзя начать игру
     ddded = 0
     pygame.display.flip()
     while True:
@@ -230,6 +241,7 @@ def mn():
                     turtole_color = pygame.Color('Silver')
                     octupos_color = pygame.Color('Silver')
                     ddded += 1
+                    skin = 'crab'
 
                 # если пользователь выбрал скин осьминога, меняем цвет прямоугольника
                 if (370 >= pygame.mouse.get_pos()[0] >= 230 or 367 >= pygame.mouse.get_pos()[0] >= 217) \
@@ -238,6 +250,7 @@ def mn():
                     turtole_color = pygame.Color('Silver')
                     octupos_color = pygame.Color('DeepPink')
                     ddded += 1
+                    skin = 'octupos'
 
                 # если пользователь выбрал скин черепахи, меняем цвет прямоугольника
                 if 600 >= pygame.mouse.get_pos()[0] >= 460 \
@@ -246,19 +259,22 @@ def mn():
                     turtole_color = pygame.Color('DeepPink')
                     octupos_color = pygame.Color('Silver')
                     ddded += 1
+                    skin = 'turtole'
                 # кнопка начать игру
                 # должно открываться игровое поле
                 # начало игры
                 if 620 >= pygame.mouse.get_pos()[0] >= 440 and 540 >= pygame.mouse.get_pos()[1] >= 470:
-                    print(text)
-                    print(time_hod)
                     # если все правильно введено, то кнопка начать игру работает
                     # осуществляем проверку с помощью переменной time_hod
                     if time_hod != 'Error' and ddded > 0:
+                        time = text
                         # меняем цвет кнопки запуска игры, на активный
                         b_color = pygame.Color('YellowGreen')
                         # меняем текст кнопки запуска
                         b_text = 'Начать игру'
+                        print(level)
+                        print(skin)
+                        print(time)
                     else:
                         # меняем цвет кнопки запуска, на неактивный
                         b_color = pygame.Color('Silver')
@@ -340,5 +356,6 @@ def mn():
         pygame.display.update()
         pygame.display.flip()
         clock.tick(30)
+
 
 a = Menu()

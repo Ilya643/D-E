@@ -212,6 +212,7 @@ def mn():
     turtole_color = pygame.Color('Silver')
     crab_color = pygame.Color('Silver')
     octupos_color = pygame.Color('Silver')
+    ddded = 0
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
@@ -222,6 +223,29 @@ def mn():
                 # на тот случай если пользователь захочет вернуться к выбору уровня игры
                 if 160 >= pygame.mouse.get_pos()[0] >= 20 and 540 >= pygame.mouse.get_pos()[1] >= 470:
                     main()
+                # если пользователь выбрал скин краба, меняем цвет прямоугольника
+                if (170 >= pygame.mouse.get_pos()[0] >= 30 or 166 >= pygame.mouse.get_pos()[0] >= 40) \
+                        and (270 >= pygame.mouse.get_pos()[1] >= 230 or 430 >= pygame.mouse.get_pos()[1] >= 327):
+                    crab_color = pygame.Color('DeepPink')
+                    turtole_color = pygame.Color('Silver')
+                    octupos_color = pygame.Color('Silver')
+                    ddded += 1
+
+                # если пользователь выбрал скин осьминога, меняем цвет прямоугольника
+                if (370 >= pygame.mouse.get_pos()[0] >= 230 or 367 >= pygame.mouse.get_pos()[0] >= 217) \
+                        and (270 >= pygame.mouse.get_pos()[1] >= 230 or 430 >= pygame.mouse.get_pos()[1] >= 287):
+                    crab_color = pygame.Color('Silver')
+                    turtole_color = pygame.Color('Silver')
+                    octupos_color = pygame.Color('DeepPink')
+                    ddded += 1
+
+                # если пользователь выбрал скин черепахи, меняем цвет прямоугольника
+                if 600 >= pygame.mouse.get_pos()[0] >= 460 \
+                        and (270 >= pygame.mouse.get_pos()[1] >= 230 or 440 >= pygame.mouse.get_pos()[1] >= 280):
+                    crab_color = pygame.Color('Silver')
+                    turtole_color = pygame.Color('DeepPink')
+                    octupos_color = pygame.Color('Silver')
+                    ddded += 1
                 # кнопка начать игру
                 # должно открываться игровое поле
                 # начало игры
@@ -230,7 +254,7 @@ def mn():
                     print(time_hod)
                     # если все правильно введено, то кнопка начать игру работает
                     # осуществляем проверку с помощью переменной time_hod
-                    if time_hod != 'Error':
+                    if time_hod != 'Error' and ddded > 0:
                         # меняем цвет кнопки запуска игры, на активный
                         b_color = pygame.Color('YellowGreen')
                         # меняем текст кнопки запуска
@@ -265,21 +289,24 @@ def mn():
         crab_rect = crab.get_rect(center=(250 // 2, 790 // 2))
         screen.blit(crab, crab_rect)
         # кнопка названия краба
-        pygame.draw.rect(screen, (57, 255, 20), (30, 240, 140, 30))
+        pygame.draw.rect(screen, crab_color, (30, 230, 140, 40))
+        screen.blit(font.render('Краб', True, (0, 0, 0)), (50, 230))
         # скин осьминога
         octopus = pygame.image.load('img_Octopus.bmp')
         octopus.set_colorkey((255, 255, 255))
         octopus_rect = octopus.get_rect(center=(550 // 2, 820 // 2))
         screen.blit(octopus, octopus_rect)
         # кнопка названия осьминога
-        pygame.draw.rect(screen, (57, 255, 20), (230, 240, 140, 30))
+        pygame.draw.rect(screen, octupos_color, (230, 230, 140, 40))
+        screen.blit(font.render('Осьминог', True, (0, 0, 0)), (230, 230))
         # скин черепахи
         turtole2 = pygame.image.load('img_turtel2.bmp')
         turtole2.set_colorkey((255, 255, 255))
         turtole2_rect = turtole2.get_rect(center=(950 // 2, 820 // 2))
         screen.blit(turtole2, turtole2_rect)
         # кнопка названия черепахи
-        pygame.draw.rect(screen, (57, 255, 20), (460, 240, 140, 30))
+        pygame.draw.rect(screen, turtole_color, (460, 230, 140, 40))
+        screen.blit(font.render('Черепаха', True, (0, 0, 0)), (460, 230))
 
         # прямоугольник для кнопки возврата
         pygame.draw.rect(screen, (57, 255, 20), (20, 470, 140, 70))

@@ -1,4 +1,5 @@
 import pygame
+import sqlite3
 
 pygame.init()
 
@@ -67,6 +68,18 @@ class Menu:
         return_button = pygame.draw.rect(self.screen, (57, 255, 20), (580, 480, 150, 50))
         self.return_button = return_button
         self.screen.blit(self.font.render('Вернуться', True, (0, 0, 0)), (585, 490))
+        con = sqlite3.connect('база_данных007.db')
+        cur = con.cursor()
+
+        result = cur.execute('''SELECT правила FROM Rules''')
+
+        answer = []
+        for el in result:
+            answer.append(el[0])
+        for i in answer:
+            self.screen.blit(self.font.render(i, True, (57, 255, 20)), (0, 0))
+
+        con.close()
         pygame.display.update()
         pygame.display.flip()
         while True:

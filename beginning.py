@@ -61,24 +61,25 @@ class Menu:
 
     def rules(self):
         # в это функии мы выводим правила по запросу из бд
-        self.screen = pygame.display.set_mode((750, 550))
+        self.screen = pygame.display.set_mode((1100, 680))
         self.screen.fill('black')
         pygame.display.set_caption("Rules")
         # создаем кнопку возвращения, чтобы после прочтения правил можно было вернуться в главное меню
-        return_button = pygame.draw.rect(self.screen, (57, 255, 20), (580, 480, 150, 50))
+        return_button = pygame.draw.rect(self.screen, (57, 255, 20), (900, 620, 150, 50))
         self.return_button = return_button
-        self.screen.blit(self.font.render('Вернуться', True, (0, 0, 0)), (585, 490))
+        self.screen.blit(self.font.render('Вернуться', True, (0, 0, 0)), (905, 620))
         con = sqlite3.connect('база_данных007.db')
         cur = con.cursor()
 
         result = cur.execute('''SELECT правила FROM Rules''')
-
-        answer = []
+        print(result)
+        y = 0
         for el in result:
-            answer.append(el[0])
-        for i in answer:
-            self.screen.blit(self.font.render(i, True, (57, 255, 20)), (0, 0))
-
+            for i in el:
+                font = pygame.font.SysFont('Arial', 20)
+                txt = font.render(i, True, (57, 255, 20))
+                self.screen.blit(txt, (0, y))
+                y += 20
         con.close()
         pygame.display.update()
         pygame.display.flip()
@@ -87,7 +88,7 @@ class Menu:
                 if event.type == pygame.QUIT:
                     exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if 730 >= pygame.mouse.get_pos()[0] >= 580 and 530 >= pygame.mouse.get_pos()[1] >= 480:
+                    if 1050 >= pygame.mouse.get_pos()[0] >= 900 and 670 >= pygame.mouse.get_pos()[1] >= 620:
                         # запускаем функцию создания меню
                         # делаем это через создание нового элемента класса
                         Menu()
@@ -185,7 +186,7 @@ def main():
     ]
     for rb in level_buttons:
         rb.setLevelButtons(level_buttons)
-    level_buttons[0].clicked = True
+    level_buttons[0].clicked = False
 
     group = pygame.sprite.Group(level_buttons)
 
@@ -224,10 +225,10 @@ def mn():
     color_inactive = pygame.Color('lightskyblue3')
     color_active = pygame.Color('dodgerblue2')
     color = color_inactive
-    # цвет кнопки начать игру, при неактивном состоянии
-    b_color = pygame.Color('Silver')
+    # цвет кнопки начать игру, при активном состоянии
+    b_color = pygame.Color('YellowGreen')
     # текст для кнопки запуска игры
-    b_text = 'Проверить'
+    b_text = 'Начать игру'
     active = False
     text = '10'
     time_hod = 'Error'
@@ -257,7 +258,7 @@ def mn():
                     skin = 'crab'
 
                 # если пользователь выбрал скин осьминога, меняем цвет прямоугольника
-                if (370 >= pygame.mouse.get_pos()[0] >= 230 or 367 >= pygame.mouse.get_pos()[0] >= 217) \
+                if (385 >= pygame.mouse.get_pos()[0] >= 245 or 397 >= pygame.mouse.get_pos()[0] >= 238) \
                         and (270 >= pygame.mouse.get_pos()[1] >= 230 or 430 >= pygame.mouse.get_pos()[1] >= 287):
                     crab_color = pygame.Color('Silver')
                     turtole_color = pygame.Color('Silver')
@@ -281,18 +282,16 @@ def mn():
                     # осуществляем проверку с помощью переменной time_hod
                     if time_hod != 'Error' and ddded > 0:
                         time = text
-                        # меняем цвет кнопки запуска игры, на активный
-                        b_color = pygame.Color('YellowGreen')
-                        # меняем текст кнопки запуска
-                        b_text = 'Начать игру'
+                        # выходим из меню и запускаем игровое поле
                         print(level)
                         print(skin)
                         print(time)
+                        exit()
                     else:
                         # меняем цвет кнопки запуска, на неактивный
                         b_color = pygame.Color('Silver')
                         # убираем тект начала игры
-                        b_text = 'Проверить'
+                        b_text = 'Начать игру'
                 # Если пользователь нажал на время игры
                 # окно время хода пользователь редактировать не может
                 if input_box.collidepoint(event.pos):
@@ -305,7 +304,7 @@ def mn():
             if event.type == pygame.KEYDOWN:
                 if active:
                     if event.key == pygame.K_RETURN:
-                        if not text.isdigit() or len(text) > 3 or int(text) < 5 or int(text) > 25:
+                        if not text.isdigit() or len(text) > 2 or int(text) < 5 or int(text) > 25:
                             text = ''
                     elif event.key == pygame.K_BACKSPACE:
                         text = text[:-1]
@@ -323,11 +322,11 @@ def mn():
         # скин осьминога
         octopus = pygame.image.load('img_Octopus.bmp')
         octopus.set_colorkey((255, 255, 255))
-        octopus_rect = octopus.get_rect(center=(550 // 2, 820 // 2))
+        octopus_rect = octopus.get_rect(center=(590 // 2, 820 // 2))
         screen.blit(octopus, octopus_rect)
         # кнопка названия осьминога
-        pygame.draw.rect(screen, octupos_color, (230, 230, 140, 40))
-        screen.blit(font.render('Осьминог', True, (0, 0, 0)), (230, 230))
+        pygame.draw.rect(screen, octupos_color, (245, 230, 140, 40))
+        screen.blit(font.render('Осьминог', True, (0, 0, 0)), (249, 230))
         # скин черепахи
         turtole2 = pygame.image.load('img_turtel2.bmp')
         turtole2.set_colorkey((255, 255, 255))
@@ -346,6 +345,10 @@ def mn():
         screen.blit(font.render('Время хода (в секундах):', True, (57, 255, 20)), (10, 100))
         screen.blit(font.render(b_text, True, (0, 0, 0)), (450, 480))
         # Размещаем текст в окне
+        # эта проверка не позволит пользователю, выйти за рамки окна ввода
+        # если текст превышает длинну окна, то у него отрезаются первые 10 символов
+        if len(text) > 10:
+            text = text[0: 10]
         txt_surface = font.render(text, True, color)
         # проверка время хода
         # что бы не было ошибок при вводе времени игры
@@ -359,7 +362,7 @@ def mn():
             time_hod = 'Error'
             txt_surface2 = font.render(time_hod, True, color)
         # Удлиняем поле ввода, если вводимый текст слишком длинный
-        width = max(200, txt_surface.get_width() + 10)
+        width = 220
         input_box.w = width
         # отражаем текст в окнах
         screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
@@ -372,3 +375,4 @@ def mn():
 
 
 a = Menu()
+

@@ -17,6 +17,8 @@ units_peek = (700, 0, 900, 700)
 cell_size = 70
 coords_unit = 0
 letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+letters_r = ['H', 'G', 'F', 'E', 'D', 'C', 'B', 'A']
+move = True
 
 level = 2
 time = 10
@@ -33,6 +35,7 @@ con.close()
 
 board_units_f = []
 board_units_e = []
+move1 = True
 for i in result:
     if i[1] == 'f':
         board_units_f.append([i[2], (int(i[3].split(',')[0]), int(i[3].split(',')[1])), i[4]])
@@ -59,8 +62,11 @@ elif level == 2:
     cells = [cells[2:4], cells[4:], cells[:2]]
 else:
     cells = [cells[:2], cells[2:]]
-print(cells)
 
+
+def move_flip(matrix):
+    matrix = [list(reversed(col)) for col in zip(*matrix)]
+    return [list(reversed(col)) for col in zip(*matrix)]
 
 
 class Board:
@@ -83,6 +89,12 @@ class Board:
             self.board.append(stroka)
 
     def render(self):
+        pygame.draw.rect(screen, pygame.Color(255, 170, 0), (indent - part - 4, indent - part - 4,
+                                                             cell_size * 8 + part * 2 + 8,
+                                                             cell_size * 8 + part * 2 + 8))
+        pygame.draw.rect(screen, pygame.Color('black'), (indent - 4, indent - 4,
+                                                         cell_size * 8 + 8,
+                                                         cell_size * 8 + 8))
         for y in range(self.height):
             for x in range(self.width):
                 if self.board[y][x] == 1:
@@ -97,12 +109,6 @@ class Board:
                     x * cell_size + indent, y * cell_size + indent, cell_size,
                     cell_size)
 
-        pygame.draw.rect(screen, pygame.Color('black'), (indent - 4, indent - 4,
-                                                         cell_size * 8 + 8,
-                                                         cell_size * 8 + 8), 4)
-        pygame.draw.rect(screen, pygame.Color(255, 170, 0), (indent - part - 4, indent - part - 4,
-                                                        cell_size * 8 + part * 2 + 8,
-                                                        cell_size * 8 + part * 2 + 8), part)
         pygame.draw.rect(screen, pygame.Color('darkslategray4'),
                          units_peek)
 
@@ -113,7 +119,6 @@ class Board:
         self.image = pygame.image.load('Cyber_Turtle_Enemy_Duke.png').convert_alpha()
         self.image = pygame.transform.rotate(self.image, 180)
         screen.blit(pygame.transform.scale(self.image, (80, 80)), (710, 150))
-
 
         self.image = pygame.image.load('Cyber_Turtle_Friendly_Executioner.png').convert_alpha()
         screen.blit(pygame.transform.scale(self.image, (80, 80)), (710, 270))
@@ -128,7 +133,8 @@ class Board:
         screen.blit(pygame.transform.scale(self.image, (80, 80)), (710, 540))
 
         numbers_e = [felled_figures_e[1], felled_figures_e[2]]
-        numbers_f = [felled_figures_f[1], felled_figures_f[2], felled_figures_f[3], felled_figures_f[4]]
+        numbers_f = [felled_figures_f[1], felled_figures_f[2], felled_figures_f[3],
+                     felled_figures_f[4]]
 
         y1 = 95
         for i in numbers_e:
@@ -143,23 +149,33 @@ class Board:
             y1 += 90
 
         y1 = 585
-        for i in range(1, 9):
-            textsurface = myfont.render(str(i), False, (0, 0, 0))
-            screen.blit(textsurface, (52, y1))
-            y1 -= 70
+        if move == 1:
+            for i in range(1, 9):
+                textsurface = myfont.render(str(i), False, (0, 0, 0))
+                screen.blit(textsurface, (52, y1))
+                y1 -= 70
+        else:
+            for i in range(8, 0, -1):
+                textsurface = myfont.render(str(i), False, (0, 0, 0))
+                screen.blit(textsurface, (52, y1))
+                y1 -= 70
 
         x1 = 95
-        for i in letters:
-            textsurface = myfont.render(i, False, (0, 0, 0))
-            screen.blit(textsurface, (x1, 635))
-            x1 += 70
+        if move == 1:
+            for i in letters:
+                textsurface = myfont.render(i, False, (0, 0, 0))
+                screen.blit(textsurface, (x1, 635))
+                x1 += 70
+        else:
+            for i in letters_r:
+                textsurface = myfont.render(i, False, (0, 0, 0))
+                screen.blit(textsurface, (x1, 635))
+                x1 += 70
 
         textsurface = myfont.render('До конца игры:', False, pygame.Color('dodgerblue'))
         screen.blit(textsurface, (45, 20))
         textsurface = myfont.render('До конца хода:', False, pygame.Color('dodgerblue'))
         screen.blit(textsurface, (275, 20))
-
-
 
     def check(self, x, y):
         for i in self.slovar_with_coords:
@@ -181,19 +197,22 @@ class Board:
     def update(self):
         for i in board_units_f:
             screen.blit(pygame.transform.scale(
-                pygame.image.load(i[0]).convert_alpha(), (60, 60)), (5 + indent + i[1][0] * cell_size,
-                                                                     5 + indent + i[1][1] * cell_size))
+                pygame.image.load(i[0]).convert_alpha(), (60, 60)),
+                (5 + indent + i[1][0] * cell_size,
+                 5 + indent + i[1][1] * cell_size))
 
         for i in board_units_e:
             screen.blit(pygame.transform.scale(
-                pygame.image.load(i[0]).convert_alpha(), (60, 60)), (5 + indent + i[1][0] * cell_size,
-                                                                     5 + indent + i[1][1] * cell_size))
+                pygame.image.load(i[0]).convert_alpha(), (60, 60)),
+                (5 + indent + i[1][0] * cell_size,
+                 5 + indent + i[1][1] * cell_size))
 
         for i in moves:
             pygame.draw.circle(screen, pygame.Color(4, 255, 0), (35 + indent + i[0][0] * cell_size,
-                                                                 35 + indent + i[0][1] * cell_size), 8)
+                                                                 35 + indent + i[0][1] * cell_size),
+                               8)
 
-    def moving(self, coords):
+    def moving_1(self, coords):
         del moves[:]
         global t_move
         t_move = (time * 60) * 15 // 100
@@ -241,7 +260,6 @@ class Board:
                 screen.blit(txt, (440, 20))
             pygame.display.flip()
             dt = clock.tick(30) / 1000
-
 
 
 class Pawn_1:
@@ -589,12 +607,14 @@ while running:
                         coords_unit = (i[1])
                         board.check_piece(n)(check[1])
                         break
-
                 if k:
                     for i in moves:
                         if check[1] in i:
-                            board.moving(check[1])
-
+                            board.moving_1(check[1])
+                            if move:
+                                move = False
+                            else:
+                                move = True
     screen.fill(pygame.Color('gray19'))
     board.render()
     board.update()
@@ -603,7 +623,7 @@ while running:
         screen.blit(arrow, (x, y))
     board.time()
     pygame.display.update()
-
     clock.tick(FPS)
 
 pygame.quit()
+

@@ -1,15 +1,18 @@
 import pygame
 import sqlite3
+from random import sample
 
 pygame.init()
 
 # передает значение о выбранном уровне
 level = 0
 # передает значение о выбранном времени
-time = 0
+time = 10
+timer = int(time) * 60
+t_move = int(timer) * 15 // 100
+dt = 0
 # передает значение о выбранном скине
 skin = 0
-
 # меню игры D&E
 # создание самого первого окна меню
 
@@ -287,7 +290,12 @@ def mn():
                         print(level)
                         print(skin)
                         print(time)
-                        play_now()
+                        global timer
+                        global t_move
+                        print(timer)
+                        print(t_move)
+
+                        play_now(timer, t_move)
                         exit()
                     else:
                         # меняем цвет кнопки запуска, на неактивный
@@ -376,36 +384,66 @@ def mn():
         clock.tick(30)
 
 
-def play_now():
+
+
+def play_now(timer, t_move):
     size = 900, 700
     pygame.display.set_caption('D&E')
     screen = pygame.display.set_mode(size)
+
+    myfont = pygame.font.SysFont(None, 30)
+    clock = pygame.time.Clock()
+    dt = 0
 
     indent = 70
     part = 20
     units_peek = (700, 0, 900, 700)
     cell_size = 70
     coords_unit = 0
+    letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
-    board_units_f = [['Cyber_Turtle_Friendly_Executioner.png', (0, 6), 1],
-                     ['Cyber_Turtle_Friendly_Executioner.png', (1, 6), 1],
-                     ['Cyber_Turtle_Friendly_Executioner.png', (2, 6), 1],
-                     ['Cyber_Turtle_Friendly_Defender.png', (3, 6), 2],
-                     ['Cyber_Turtle_Friendly_Defender.png', (4, 6), 2],
-                     ['Cyber_Turtle_Friendly_Executioner.png', (5, 6), 1],
-                     ['Cyber_Turtle_Friendly_Executioner.png', (6, 6), 1],
-                     ['Cyber_Turtle_Friendly_Executioner.png', (7, 6), 1],
-                     ['Cyber_Turtle_Friendly_King.png', (3, 7), 3], ['Cyber_Turtle_Friendly_Jumper.png', (4, 7), 4]]
-    board_units_e = [['Cyber_Turtle_Enemy_Executioner.png', (1, 1), 1],
-                     ['Cyber_Turtle_Enemy_Executioner.png', (2, 1), 1],
-                     ['Cyber_Turtle_Enemy_Executioner.png', (3, 1), 1],
-                     ['Cyber_Turtle_Enemy_Executioner.png', (4, 1), 1],
-                     ['Cyber_Turtle_Enemy_Executioner.png', (5, 1), 1],
-                     ['Cyber_Turtle_Enemy_Executioner.png', (6, 1), 1],
-                     ['Cyber_Turtle_Enemy_Duke.png', (2, 0), 2], ['Cyber_Turtle_Enemy_Duke.png', (3, 0), 2],
-                     ['Cyber_Turtle_Enemy_Duke.png', (4, 0), 2], ['Cyber_Turtle_Enemy_Duke.png', (5, 0), 2]]
+    global level
+    global time
+    skin = 'turtole'
+    timer = int(time) * 60
+    t_move = int(timer) * 15 // 100
+    FPS = 100
+
+    con = sqlite3.connect('база_данных007.db')
+    cur = con.cursor()
+    result = cur.execute(f"""SELECT * FROM Figures
+                            WHERE Skin = '{skin}'""").fetchall()
+    con.close()
+
+    board_units_f = []
+    board_units_e = []
+    for i in result:
+        if i[1] == 'f':
+            board_units_f.append([i[2], (int(i[3].split(',')[0]), int(i[3].split(',')[1])), i[4]])
+        else:
+            board_units_e.append([i[2], (int(i[3].split(',')[0]), int(i[3].split(',')[1])), i[4]])
+
+    felled_figures_f = {1: 0, 2: 0, 3: 0, 4: 0}
     felled_figures_e = {1: 0, 2: 0}
     moves = []
+
+    cells = [(0, 2), (0, 3), (0, 4), (0, 5),
+             (1, 2), (1, 3), (1, 4), (1, 5),
+             (2, 2), (2, 3), (2, 4), (2, 5),
+             (3, 2), (3, 3), (3, 4), (3, 5),
+             (4, 2), (4, 3), (4, 4), (4, 5),
+             (5, 2), (5, 3), (5, 4), (5, 5),
+             (6, 2), (6, 3), (6, 4), (6, 5),
+             (7, 2), (7, 3), (7, 4), (7, 5)]
+
+    cells = sample(cells, 8)
+    if level == 1:
+        cells = [cells[4:6], cells[6:], cells[:4]]
+    elif level == 2:
+        cells = [cells[2:4], cells[4:], cells[:2]]
+    else:
+        cells = [cells[:2], cells[2:]]
+    print(cells)
 
     class Board:
         def __init__(self, width, height):
@@ -450,6 +488,58 @@ def play_now():
             pygame.draw.rect(screen, pygame.Color('darkslategray4'),
                              units_peek)
 
+            self.image = pygame.image.load('Cyber_Turtle_Enemy_Executioner.png').convert_alpha()
+            self.image = pygame.transform.rotate(self.image, 180)
+            screen.blit(pygame.transform.scale(self.image, (80, 80)), (710, 60))
+
+            self.image = pygame.image.load('Cyber_Turtle_Enemy_Duke.png').convert_alpha()
+            self.image = pygame.transform.rotate(self.image, 180)
+            screen.blit(pygame.transform.scale(self.image, (80, 80)), (710, 150))
+
+            self.image = pygame.image.load('Cyber_Turtle_Friendly_Executioner.png').convert_alpha()
+            screen.blit(pygame.transform.scale(self.image, (80, 80)), (710, 270))
+
+            self.image = pygame.image.load('Cyber_Turtle_Friendly_Defender.png').convert_alpha()
+            screen.blit(pygame.transform.scale(self.image, (80, 80)), (710, 360))
+
+            self.image = pygame.image.load('Cyber_Turtle_Friendly_King.png').convert_alpha()
+            screen.blit(pygame.transform.scale(self.image, (80, 80)), (710, 450))
+
+            self.image = pygame.image.load('Cyber_Turtle_Friendly_Jumper.png').convert_alpha()
+            screen.blit(pygame.transform.scale(self.image, (80, 80)), (710, 540))
+
+            numbers_e = [felled_figures_e[1], felled_figures_e[2]]
+            numbers_f = [felled_figures_f[1], felled_figures_f[2], felled_figures_f[3], felled_figures_f[4]]
+
+            y1 = 95
+            for i in numbers_e:
+                textsurface = myfont.render(str(i), False, (0, 0, 0))
+                screen.blit(textsurface, (810, y1))
+                y1 += 90
+
+            y1 += 30
+            for i in numbers_f:
+                textsurface = myfont.render(str(i), False, (0, 0, 0))
+                screen.blit(textsurface, (810, y1))
+                y1 += 90
+
+            y1 = 585
+            for i in range(1, 9):
+                textsurface = myfont.render(str(i), False, (0, 0, 0))
+                screen.blit(textsurface, (52, y1))
+                y1 -= 70
+
+            x1 = 95
+            for i in letters:
+                textsurface = myfont.render(i, False, (0, 0, 0))
+                screen.blit(textsurface, (x1, 635))
+                x1 += 70
+
+            textsurface = myfont.render('До конца игры:', False, pygame.Color('dodgerblue'))
+            screen.blit(textsurface, (45, 20))
+            textsurface = myfont.render('До конца хода:', False, pygame.Color('dodgerblue'))
+            screen.blit(textsurface, (275, 20))
+
         def check(self, x, y):
             for i in self.slovar_with_coords:
                 coords = self.slovar_with_coords.get(i)
@@ -470,13 +560,13 @@ def play_now():
         def update(self):
             for i in board_units_f:
                 screen.blit(pygame.transform.scale(
-                    pygame.image.load(i[0]).convert_alpha(), (60, 60)), (5 + indent + int(i[1][0]) * cell_size,
-                                                                         5 + indent + int(i[1][1]) * cell_size))
+                    pygame.image.load(i[0]).convert_alpha(), (60, 60)), (5 + indent + i[1][0] * cell_size,
+                                                                         5 + indent + i[1][1] * cell_size))
 
             for i in board_units_e:
                 screen.blit(pygame.transform.scale(
-                    pygame.image.load(i[0]).convert_alpha(), (60, 60)), (5 + indent + int(i[1][0]) * cell_size,
-                                                                         5 + indent + int(i[1][1]) * cell_size))
+                    pygame.image.load(i[0]).convert_alpha(), (60, 60)), (5 + indent + i[1][0] * cell_size,
+                                                                         5 + indent + i[1][1] * cell_size))
 
             for i in moves:
                 pygame.draw.circle(screen, pygame.Color(4, 255, 0), (35 + indent + i[0][0] * cell_size,
@@ -484,10 +574,22 @@ def play_now():
 
         def moving(self, coords):
             del moves[:]
+            global t_move
+            t_move = (int(time) * 60) * 15 // 100
             for i in board_units_f:
                 if coords_unit in i:
                     m = board_units_f.index(i)
                     a = board_units_f.pop(m)
+                    if coords in cells[1]:
+                        cells[1].pop(cells[1].index(coords))
+                        print('Вы наступили на плохую клетку! ИИ ходит два раза')
+                    elif coords in cells[0]:
+                        cells[0].pop(cells[0].index(coords))
+                        print('Вы наступили на плохую клетку! Ваша фигура умерла')
+                        break
+                    elif len(cells) == 3 and coords in cells[2]:
+                        cells[2].pop(cells[2].index(coords))
+                        print('Вы наступили на хорошую клетку! Вам выдан дополнительный ход')
                     a.pop(1)
                     a.insert(1, coords)
                     board_units_f.insert(m, a)
@@ -497,6 +599,27 @@ def play_now():
                     ind = board_units_e.pop(board_units_e.index(i))[-1]
                     felled_figures_e[ind] = felled_figures_e.get(ind) + 1
                     break
+
+        def time(self):
+            global timer, t_move, dt
+            timer -= dt
+            t_move -= dt
+
+            if timer > 0:
+                if len(str(round(timer) % 60)) == 2:
+                    t = str(round(timer) // 60) + ':' + str(round(timer) % 60)
+                else:
+                    t = str(round(timer) // 60) + ':' + '0' + str(round(timer) % 60)
+
+                txt = myfont.render(t, True, pygame.Color('dodgerblue'))
+                screen.blit(txt, (210, 20))
+
+                if t_move > 0:
+                    t = str(round(t_move))
+                    txt = myfont.render(t, True, pygame.Color('dodgerblue'))
+                    screen.blit(txt, (440, 20))
+                pygame.display.flip()
+                dt = clock.tick(30) / 1000
 
     class Pawn_1:
         def __init__(self, coords):
@@ -845,14 +968,16 @@ def play_now():
                             if check[1] in i:
                                 board.moving(check[1])
 
-        screen.fill((163, 110, 255))
+        screen.fill(pygame.Color('gray19'))
         board.render()
         board.update()
         if pygame.mouse.get_focused():
             x, y = pygame.mouse.get_pos()
             screen.blit(arrow, (x, y))
+        board.time()
         pygame.display.update()
+
+        clock.tick(FPS)
 
 
 a = Menu()
-

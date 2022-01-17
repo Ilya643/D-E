@@ -35,11 +35,15 @@ class Menu:
         # кнопка правила
         continue_button = pygame.draw.rect(self.screen, (57, 255, 20), (20, 130, 150, 50))
         self.continue_button = continue_button
-        self.screen.blit(self.font.render('Правила', True, (0, 0, 0)), (40, 140))
+        self.screen.blit(self.font.render('Правила', True, (0, 0, 0)), (40, 135))
+        # кнопка рекордов
+        record_button = pygame.draw.rect(self.screen, (57, 255, 20), (20, 220, 150, 50))
+        self.record_button = record_button
+        self.screen.blit(self.font.render('Рекорды', True, (0, 0, 0)), (40, 225))
         # кнопка выход
-        quit_button = pygame.draw.rect(self.screen, (57, 255, 20), (20, 220, 150, 50))
+        quit_button = pygame.draw.rect(self.screen, (57, 255, 20), (20, 310, 150, 50))
         self.quit_button = quit_button
-        self.screen.blit(self.font.render('Выход', True, (0, 0, 0)), (50, 230))
+        self.screen.blit(self.font.render('Выход', True, (0, 0, 0)), (50, 320))
         pygame.display.update()
         pygame.display.flip()
         self.moving()
@@ -48,9 +52,6 @@ class Menu:
     def moving(self):
         while True:
             for event in pygame.event.get():
-                if event.type == pygame.MOUSEMOTION:
-                    if 170 >= pygame.mouse.get_pos()[0] >= 20 and 90 >= pygame.mouse.get_pos()[1] >= 40:
-                        pass
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if 170 >= pygame.mouse.get_pos()[0] >= 20 and 90 >= pygame.mouse.get_pos()[1] >= 40:
                         # запускаем функцию старт
@@ -59,31 +60,31 @@ class Menu:
                         # запускаем функцию правила
                         self.rules()
                     if 170 >= pygame.mouse.get_pos()[0] >= 20 and 270 >= pygame.mouse.get_pos()[1] >= 220:
+                        # запускаем функцию рекордов
+                        self.record()
+                    if 170 >= pygame.mouse.get_pos()[0] >= 20 and 360 >= pygame.mouse.get_pos()[1] >= 310:
                         # выход из игры
                         exit()
 
     def rules(self):
-        # в это функии мы выводим правила по запросу из бд
-        self.screen = pygame.display.set_mode((1100, 700))
+        # в это функии мы выводим правила с помощью работы с файлами
+        self.screen = pygame.display.set_mode((1120, 700))
         self.screen.fill('black')
         pygame.display.set_caption("Rules")
         # создаем кнопку возвращения, чтобы после прочтения правил можно было вернуться в главное меню
         return_button = pygame.draw.rect(self.screen, (57, 255, 20), (900, 620, 150, 50))
         self.return_button = return_button
         self.screen.blit(self.font.render('Вернуться', True, (0, 0, 0)), (905, 620))
-        con = sqlite3.connect('база_данных007.db')
-        cur = con.cursor()
-
-        result = cur.execute('''SELECT правила FROM Rules''')
-        print(result)
+        document = open('pravila_D&E.txt', encoding='utf8')
+        document2 = document.readlines()
         y = 0
-        for el in result:
-            for i in el:
-                font = pygame.font.SysFont('Arial', 20)
-                txt = font.render(i, True, (57, 255, 20))
-                self.screen.blit(txt, (22, y))
-                y += 20
-        con.close()
+        # работа с файлом
+        for el in document2:
+            el = el.replace('\n', '')
+            font = pygame.font.SysFont('Arial', 20)
+            txt = font.render(el, True, (57, 255, 20))
+            self.screen.blit(txt, (22, y))
+            y += 20
         pygame.display.update()
         pygame.display.flip()
         while True:
@@ -95,6 +96,25 @@ class Menu:
                         # запускаем функцию создания меню
                         # делаем это через создание нового элемента класса
                         Menu()
+
+    def record(self):
+        self.screen.fill('black')
+        pygame.display.set_caption("Records")
+        return_button2 = pygame.draw.rect(self.screen, (57, 255, 20), (460, 420, 150, 50))
+        self.return_button2 = return_button2
+        self.screen.blit(self.font.render('Вернуться', True, (0, 0, 0)), (465, 425))
+        pygame.display.update()
+        pygame.display.flip()
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if 610 >= pygame.mouse.get_pos()[0] >= 460 and 470 >= pygame.mouse.get_pos()[1] >= 420:
+                        # запускаем функцию создания меню
+                        # делаем это через создание нового элемента класса
+                        Menu()
+
 
     def start(self):
         self.screen.fill('black')
@@ -978,5 +998,5 @@ def mn():
         clock.tick(30)
 
 
-
 a = Menu()
+

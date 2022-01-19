@@ -361,18 +361,16 @@ def mn():
                         move = True
                         unit = (board_units_f, board_units_e)
 
-                        cells = sample(cells, 8)
                         if level == 1:
-                            cells = [cells[4:6], cells[6:], cells[:4]]
+                            cells = sample(cells, 2)
                         elif level == 2:
-                            cells = [cells[2:4], cells[4:], cells[:2]]
+                            cells = sample(cells, 4)
                         else:
-                            cells = [cells[:2], cells[2:]]
-
+                            cells = sample(cells, 6)
                         if skin == 'turtole':
-                            un = ['Cyber_Turtle_Friendly_Defender.png', 'Cyber_Turtle_Friendly_Executioner.png',
+                            un = ['Cyber_Turtle_Friendly_Executioner.png', 'Cyber_Turtle_Friendly_Defender.png',
                                   'Cyber_Turtle_Friendly_King.png', 'Cyber_Turtle_Friendly_Jumper.png',
-                                  'Cyber_Turtle_Enemy_Defender.png', 'Cyber_Turtle_Enemy_Executioner.png',
+                                  'Cyber_Turtle_Enemy_Executioner.png', 'Cyber_Turtle_Enemy_Defender.png',
                                   'Cyber_Turtle_Enemy_King.png', 'Cyber_Turtle_Enemy_Jumper.png']
                         elif skin == 'crab':
                             un = ['Cyber_Crab_Friendly_Defender.png', 'Cyber_Crab_Friendly_Executioner.png',
@@ -530,23 +528,28 @@ def mn():
                             def moving(self, coords):
                                 del moves[:]
                                 self.t_move = (int(time) * 60) * 15 // 100
-                                print(unit[0])
                                 for i in unit[0]:
                                     if coords_unit in i:
                                         m = unit[0].index(i)
                                         a = unit[0].pop(m)
-                                        a.pop(1)
-                                        a.insert(1, coords)
-                                        unit[0].insert(m, a)
+                                        if coords in cells:
+                                            cells.pop(cells.index(coords))
+                                        else:
+                                            a.pop(1)
+                                            a.insert(1, coords)
+                                            unit[0].insert(m, a)
                                         break
                                 for i in unit[1]:
                                     if coords in i:
                                         ind = unit[1].pop(unit[1].index(i))[-1]
-                                        felled_figures_e[ind] = felled_figures_e.get(ind) + 1
+                                        if unit[1] == board_units_e:
+                                            felled_figures_e[ind] = felled_figures_e.get(ind) + 1
+                                        else:
+                                            felled_figures_f[ind] = felled_figures_f.get(ind) + 1
                                         break
 
                             def time(self):
-                                global dt
+                                global dt, p
                                 self.timer -= dt
                                 self.t_move -= dt
 
@@ -563,8 +566,28 @@ def mn():
                                         t = str(round(self.t_move))
                                         txt = myfont.render(t, True, pygame.Color('dodgerblue'))
                                         screen.blit(txt, (440, 20))
+                                    else:
+                                        if move:
+                                            print('RED')
+                                        else:
+                                            print('BLUI')
+                                        exit()
                                     pygame.display.flip()
                                     dt = clock.tick(30) / 1000
+                                else:
+                                    blui = (felled_figures_f[1] + felled_figures_f[2] + felled_figures_f[3]
+                                            + felled_figures_f[4])
+                                    red =  (felled_figures_f[1] + felled_figures_f[2] + felled_figures_f[3]
+                                            + felled_figures_f[4])
+                                    if blui > red:
+                                        print('blui')
+                                        exit()
+                                    elif red > blui:
+                                        print('red')
+                                        exit()
+                                    else:
+                                        print('PAT')
+                                        exit()
 
                             def move_flip(self):
                                 for i in board_units_f:
@@ -921,6 +944,12 @@ def mn():
                             for event in pygame.event.get():
                                 if event.type == pygame.QUIT:
                                     running = False
+                                if board_units_e == []:
+                                    print('BLUI')
+                                    exit()
+                                if board_units_f == []:
+                                    print('RED')
+                                    exit()
                                 if event.type == pygame.MOUSEBUTTONDOWN:
                                     x, y = event.pos
                                     check = board.check(x, y)

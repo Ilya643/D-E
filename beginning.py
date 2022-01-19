@@ -137,7 +137,8 @@ class Menu:
             txt = font.render('Пока что рекордов нет', True, (57, 255, 20))
             self.screen.blit(txt, (30, 30))
         else:
-            rec = rec[(len(rec) - 5):]
+            if len(rec) > 5:
+                rec = rec[(len(rec) - 5):]
             x = 30
             y = 20
             for el in rec:
@@ -147,6 +148,7 @@ class Menu:
                 txt = font.render(str(el), True, (57, 255, 20))
                 self.screen.blit(txt, (x, y))
                 y += 80
+
         con.close()
         pygame.display.update()
         pygame.display.flip()
@@ -695,6 +697,7 @@ def mn():
                                     board_units_e[m].insert(0, n)
                                     board_units_e[m].insert(1, (x, y))
 
+
                         class Pawn_1:
                             def __init__(self, coords):
                                 self.x, self.y = coords[0], coords[1] - 1
@@ -1030,11 +1033,11 @@ def mn():
                                     # создаем новые данны в бд
                                     con = sqlite3.connect('база_данных007.db')
                                     cur = con.cursor()
-                                    result = cur.execute(f'''INSERT INTO Records (Level, Time)
-                                    VALUES ({l}, {t})''')
+                                    cur.execute(f'''INSERT INTO Records VALUES ({l}, {t})''')
+                                    con.commit()
                                     con.close()
-                                    if __name__ == '__main__':
-                                        end_blue()
+
+                                    end_blue()
                                     exit()
 
                                 if board_units_f == []:
@@ -1043,11 +1046,10 @@ def mn():
                                     # создаем новые данны в бд
                                     con = sqlite3.connect('база_данных007.db')
                                     cur = con.cursor()
-                                    result = cur.execute(f'''INSERT INTO Records (Level, Time)
-                                                                        VALUES ({l}, {t}); ''')
+                                    cur.execute(f'''INSERT INTO Records VALUES ({l}, {t})''')
+                                    con.commit()
                                     con.close()
-                                    if __name__ == '__main__':
-                                        end_red()
+                                    end_red()
                                     exit()
 
                                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -1212,3 +1214,4 @@ def end_red():
 
 
 a = Menu()
+

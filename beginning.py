@@ -77,14 +77,34 @@ class Menu:
         self.screen.blit(self.font.render('Вернуться', True, (0, 0, 0)), (905, 620))
         document = open('pravila_D&E.txt', encoding='utf8')
         document2 = document.readlines()
-        y = 0
-        # работа с файлом
-        for el in document2:
-            el = el.replace('\n', '')
-            font = pygame.font.SysFont('Arial', 20)
-            txt = font.render(el, True, (57, 255, 20))
-            self.screen.blit(txt, (22, y))
-            y += 20
+        # проверяем есть ли такой файл на устройстве пользователя
+        try:
+            document = open('pravila_D&E.txt')
+        # если нет, то выдаем предупреждение об этом
+        except IOError as _:
+            font = pygame.font.SysFont('Arial', 40)
+            txt = font.render('Файл с правилами игры не найден на вашем устройстве.', True, (57, 255, 20))
+            self.screen.blit(txt, (22, 22))
+            txt = font.render('Пожалуйста завершите установку.', True, (57, 255, 20))
+            self.screen.blit(txt, (22, 102))
+        else:
+            # проверка на тот случай если файл с правилами оказался пустым
+            if len(document2) == 0:
+                font = pygame.font.SysFont('Arial', 50)
+                txt = font.render('Файл с правилами игры пустой.', True, (57, 255, 20))
+                self.screen.blit(txt, (22, 22))
+                txt = font.render('Рекомендуем заново установить файл.', True, (57, 255, 20))
+                self.screen.blit(txt, (22, 102))
+            # если все хорошо то:
+            else:
+                y = 0
+                # работа с файлом
+                for el in document2:
+                    el = el.replace('\n', '')
+                    font = pygame.font.SysFont('Arial', 20)
+                    txt = font.render(el, True, (57, 255, 20))
+                    self.screen.blit(txt, (22, y))
+                    y += 24
         pygame.display.update()
         pygame.display.flip()
         while True:
@@ -103,6 +123,31 @@ class Menu:
         return_button2 = pygame.draw.rect(self.screen, (57, 255, 20), (460, 420, 150, 50))
         self.return_button2 = return_button2
         self.screen.blit(self.font.render('Вернуться', True, (0, 0, 0)), (465, 425))
+        # делаем запрос в бд на рекорды
+        con = sqlite3.connect('база_данных007.db')
+        cur = con.cursor()
+        result = cur.execute('''SELECT * FROM Records''')
+
+        rec = []
+        for el in result:
+            rec.append(el)
+        # изменеям список, так чтобы всегда брать последнии 5 рекордов из бд
+        if len(rec) == 0:
+            font = pygame.font.SysFont('Arial', 50)
+            txt = font.render('Пока что рекордов нет', True, (57, 255, 20))
+            self.screen.blit(txt, (30, 30))
+        else:
+            rec = rec[(len(rec) - 5):]
+            x = 30
+            y = 20
+            for el in rec:
+                el = ' '.join(el)
+                el = str(el).replace('(', '').replace(')', '').replace(',', '')
+                font = pygame.font.SysFont('Arial', 75)
+                txt = font.render(str(el), True, (57, 255, 20))
+                self.screen.blit(txt, (x, y))
+                y += 80
+        con.close()
         pygame.display.update()
         pygame.display.flip()
         while True:
@@ -114,7 +159,6 @@ class Menu:
                         # запускаем функцию создания меню
                         # делаем это через создание нового элемента класса
                         Menu()
-
 
     def start(self):
         self.screen.fill('black')
@@ -306,11 +350,8 @@ def mn():
                     if time_hod != 'Error' and ddded > 0:
                         time = int(text)
                         # выходим из меню и запускаем игровое поле
-                        print(level)
-                        print(skin)
-                        print(time)
                         # переменные для таймера игры
-                        timer = int(time) * 60
+                        timer = time * 60
                         t_move = int(timer) * 15 // 100
 
                         size = 900, 700
@@ -329,7 +370,7 @@ def mn():
                         letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
                         letters_r = ['H', 'G', 'F', 'E', 'D', 'C', 'B', 'A']
 
-                        FPS = 100
+                        fps = 100
 
                         con = sqlite3.connect('база_данных007.db')
                         cur = con.cursor()
@@ -362,11 +403,11 @@ def mn():
                         unit = (board_units_f, board_units_e)
 
                         if level == 1:
-                            cells = sample(cells, 2)
+                            cells = []
                         elif level == 2:
-                            cells = sample(cells, 4)
+                            cells = sample(cells, 2)
                         else:
-                            cells = sample(cells, 6)
+                            cells = sample(cells, 4)
                         if skin == 'turtole':
                             un = ['Cyber_Turtle_Friendly_Executioner.png', 'Cyber_Turtle_Friendly_Defender.png',
                                   'Cyber_Turtle_Friendly_King.png', 'Cyber_Turtle_Friendly_Jumper.png',
@@ -382,7 +423,6 @@ def mn():
                                   'Cyber_Octopus_Friendly_King.png', 'Cyber_Octopus_Friendly_Jumper.png',
                                   'Cyber_Octopus_Enemy_Defender.png', 'Cyber_Octopus_Enemy_Executioner.png',
                                   'Cyber_Octopus_Enemy_King.png', 'Cyber_Octopus_Enemy_Jumper.png']
-
 
                         class Board:
                             def __init__(self, width, height, timer, t_move):
@@ -492,8 +532,8 @@ def mn():
                             def check(self, x, y):
                                 for i in self.slovar_with_coords:
                                     coords = self.slovar_with_coords.get(i)
-                                    if coords[0] <= x <= coords[0] + coords[2] and coords[1] <= y <= coords[1] + coords[
-                                        3]:
+                                    if coords[0] <= x <= coords[0] + coords[2] and coords[1] <= y <= coords[1]\
+                                            + coords[3]:
                                         return [True, i]
                                 return None
 
@@ -549,7 +589,7 @@ def mn():
                                         break
 
                             def time(self):
-                                global dt, p
+                                global dt
                                 self.timer -= dt
                                 self.t_move -= dt
 
@@ -568,26 +608,67 @@ def mn():
                                         screen.blit(txt, (440, 20))
                                     else:
                                         if move:
-                                            print('RED')
+                                            # когда синии упустили свой ход
+                                            sc = pygame.display.set_mode((640, 480))
+                                            pygame.display.set_caption("end")
+                                            sc.fill('red')
+                                            font = pygame.font.SysFont('Arial', 60)
+                                            txt = font.render('Синии упустили свой ход.', True, (255, 255, 255))
+                                            sc.blit(txt, (32, 20))
+                                            txt = font.render('Красные выиграли!!!', True, (255, 255, 255))
+                                            sc.blit(txt, (32, 150))
+                                            pygame.display.update()
+                                            pygame.display.flip()
+
                                         else:
-                                            print('BLUI')
-                                        exit()
+                                            # когда красные упустили свой ход
+                                            sc = pygame.display.set_mode((640, 480))
+                                            pygame.display.set_caption("end")
+                                            sc.fill('blue')
+                                            font = pygame.font.SysFont('Arial', 50)
+                                            txt = font.render('Красные упустили свой ход.', True, (255, 255, 255))
+                                            sc.blit(txt, (32, 20))
+                                            txt = font.render('Синии выиграли!!!', True, (255, 255, 255))
+                                            sc.blit(txt, (32, 150))
+                                            pygame.display.update()
+                                            pygame.display.flip()
+
                                     pygame.display.flip()
                                     dt = clock.tick(30) / 1000
                                 else:
-                                    blui = (felled_figures_f[1] + felled_figures_f[2] + felled_figures_f[3]
-                                            + felled_figures_f[4])
-                                    red =  (felled_figures_f[1] + felled_figures_f[2] + felled_figures_f[3]
-                                            + felled_figures_f[4])
-                                    if blui > red:
-                                        print('blui')
-                                        exit()
-                                    elif red > blui:
-                                        print('red')
-                                        exit()
+                                    blui = felled_figures_f[1] + felled_figures_f[2] + felled_figures_f[3] +\
+                                           felled_figures_f[4]
+                                    red = felled_figures_e[1] + felled_figures_e[2] + felled_figures_e[3] +\
+                                          felled_figures_e[4]
+                                    if blui < red:
+                                        sc = pygame.display.set_mode((640, 480))
+                                        pygame.display.set_caption("end")
+                                        sc.fill('blue')
+                                        font = pygame.font.SysFont('Arial', 80)
+                                        txt = font.render('Синии выиграли!!!', True, (255, 255, 255))
+                                        sc.blit(txt, (32, 150))
+                                        pygame.display.update()
+                                        pygame.display.flip()
+                                    elif red < blui:
+                                        sc = pygame.display.set_mode((640, 480))
+                                        pygame.display.set_caption("end")
+                                        sc.fill('red')
+                                        font = pygame.font.SysFont('Arial', 70)
+                                        txt = font.render('Красные выиграли!!!', True, (255, 255, 255))
+                                        sc.blit(txt, (32, 150))
+                                        pygame.display.update()
+                                        pygame.display.flip()
                                     else:
-                                        print('PAT')
-                                        exit()
+                                        sc = pygame.display.set_mode((640, 480))
+                                        pygame.display.set_caption("end")
+                                        sc.fill('green')
+                                        font = pygame.font.SysFont('Arial', 60)
+                                        txt = font.render('Ничья!', True, (255, 255, 255))
+                                        sc.blit(txt, (32, 150))
+                                        txt = font.render('Все проиграли', True, (255, 255, 255))
+                                        sc.blit(txt, (32, 250))
+                                        pygame.display.update()
+                                        pygame.display.flip()
 
                             def move_flip(self):
                                 for i in board_units_f:
@@ -613,7 +694,6 @@ def mn():
                                         n = n[:-5] + n[-4:]
                                     board_units_e[m].insert(0, n)
                                     board_units_e[m].insert(1, (x, y))
-
 
                         class Pawn_1:
                             def __init__(self, coords):
@@ -945,11 +1025,31 @@ def mn():
                                 if event.type == pygame.QUIT:
                                     running = False
                                 if board_units_e == []:
-                                    print('BLUI')
+                                    l = level
+                                    t = time * 60 - timer
+                                    # создаем новые данны в бд
+                                    con = sqlite3.connect('база_данных007.db')
+                                    cur = con.cursor()
+                                    result = cur.execute(f'''INSERT INTO Records (Level, Time)
+                                    VALUES ({l}, {t})''')
+                                    con.close()
+                                    if __name__ == '__main__':
+                                        end_blue()
                                     exit()
+
                                 if board_units_f == []:
-                                    print('RED')
+                                    l = level
+                                    t = time * 60 - timer
+                                    # создаем новые данны в бд
+                                    con = sqlite3.connect('база_данных007.db')
+                                    cur = con.cursor()
+                                    result = cur.execute(f'''INSERT INTO Records (Level, Time)
+                                                                        VALUES ({l}, {t}); ''')
+                                    con.close()
+                                    if __name__ == '__main__':
+                                        end_red()
                                     exit()
+
                                 if event.type == pygame.MOUSEBUTTONDOWN:
                                     x, y = event.pos
                                     check = board.check(x, y)
@@ -985,7 +1085,7 @@ def mn():
                             board.time()
                             pygame.display.update()
 
-                            clock.tick(FPS)
+                            clock.tick(fps)
 
                         exit()
                     else:
@@ -1073,6 +1173,42 @@ def mn():
         pygame.display.update()
         pygame.display.flip()
         clock.tick(30)
+
+
+# поздравление синих
+def end_blue():
+    sc = pygame.display.set_mode((640, 480))
+    pygame.display.set_caption("end")
+    sc.fill('blue')
+    pygame.display.update()
+    pygame.display.flip()
+    fn = pygame.font.SysFont('Arial', 70)
+    txt = fn.render('Синии выиграли!!!', True, (255, 255, 255))
+    sc.blit(txt, (32, 150))
+    pygame.display.update()
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+
+
+# поздравление красных
+def end_red():
+    sc = pygame.display.set_mode((640, 480))
+    pygame.display.set_caption("end")
+    sc.fill('red')
+    pygame.display.update()
+    pygame.display.flip()
+    fn = pygame.font.SysFont('Arial', 70)
+    txt = fn.render('Красные выиграли!!!', True, (255, 255, 255))
+    sc.blit(txt, (32, 150))
+    pygame.display.update()
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
 
 
 a = Menu()

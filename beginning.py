@@ -1029,7 +1029,7 @@ def mn():
                                     running = False
                                 if board_units_e == []:
                                     l = level
-                                    t = time * 60 - timer
+                                    t = time * 60
                                     # создаем новые данны в бд
                                     con = sqlite3.connect('база_данных007.db')
                                     cur = con.cursor()
@@ -1214,4 +1214,3 @@ def end_red():
 
 
 a = Menu()
-

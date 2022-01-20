@@ -12,6 +12,8 @@ time = 0
 dt = 0
 # передает значение о выбранном скине
 skin = 0
+
+
 # меню игры D&E
 # создание самого первого окна меню
 
@@ -534,7 +536,7 @@ def mn():
                             def check(self, x, y):
                                 for i in self.slovar_with_coords:
                                     coords = self.slovar_with_coords.get(i)
-                                    if coords[0] <= x <= coords[0] + coords[2] and coords[1] <= y <= coords[1]\
+                                    if coords[0] <= x <= coords[0] + coords[2] and coords[1] <= y <= coords[1] \
                                             + coords[3]:
                                         return [True, i]
                                 return None
@@ -638,9 +640,9 @@ def mn():
                                     pygame.display.flip()
                                     dt = clock.tick(30) / 1000
                                 else:
-                                    blui = felled_figures_f[1] + felled_figures_f[2] + felled_figures_f[3] +\
+                                    blui = felled_figures_f[1] + felled_figures_f[2] + felled_figures_f[3] + \
                                            felled_figures_f[4]
-                                    red = felled_figures_e[1] + felled_figures_e[2] + felled_figures_e[3] +\
+                                    red = felled_figures_e[1] + felled_figures_e[2] + felled_figures_e[3] + \
                                           felled_figures_e[4]
                                     if blui < red:
                                         sc = pygame.display.set_mode((640, 480))
@@ -696,7 +698,6 @@ def mn():
                                         n = n[:-5] + n[-4:]
                                     board_units_e[m].insert(0, n)
                                     board_units_e[m].insert(1, (x, y))
-
 
                         class Pawn_1:
                             def __init__(self, coords):
@@ -1029,7 +1030,7 @@ def mn():
                                     running = False
                                 if board_units_e == []:
                                     l = level
-                                    t = time * 60
+                                    t = time
                                     # создаем новые данны в бд
                                     con = sqlite3.connect('база_данных007.db')
                                     cur = con.cursor()
@@ -1042,7 +1043,7 @@ def mn():
 
                                 if board_units_f == []:
                                     l = level
-                                    t = time * 60 - timer
+                                    t = time
                                     # создаем новые данны в бд
                                     con = sqlite3.connect('база_данных007.db')
                                     cur = con.cursor()
@@ -1214,3 +1215,4 @@ def end_red():
 
 
 a = Menu()
+
